@@ -1,3 +1,22 @@
+# CityVisualizer — MapExtractor v0.8 (experimental shoreline)
+
+This iteration **does not replace v0.7**. It treats the v0.7 mask as initial water, then uses OpenCV GrabCut inside a narrow editable boundary band to propose a revised shoreline. Image edges are shown separately as diagnostic evidence, not blindly followed (printed labels and piers can also produce dark lines).
+
+From the repository root, using Git CMD or PowerShell:
+
+```powershell
+git pull origin main
+.\.venv\Scripts\python.exe MapExtractor\shoreline.py --image maps\original\harn_sample.jpeg --profile MapExtractor\profiles\harn_color_photo.water.json
+```
+
+Look at `output/shoreline_v08/shoreline_overlay_v08.png`: **orange** = experimental shoreline, **green** = water added versus v0.7, **magenta** = water removed. `shoreline_dark_line_evidence_v08.png` contains Canny lines found near the old boundary; these are **unclassified visual cues**, not shoreline polygons.
+
+Other outputs: `water_mask_v07_baseline.png`, `water_mask_v08_experimental.png`, `shoreline_edge_v08.png`, `water_candidates_v08.geojson`, `shoreline_candidates_v08.geojson` (LineStrings including island shores), and `shoreline_stats_v08.json`. GeoJSON coordinates remain **image pixels**, not ground meters. All candidates are unreviewed, and IDs remain provisional.
+
+Map-specific tuning lives in the profile's `shoreline` section: `band_px` (default 5; how far the boundary may move), `iterations` (default 3), Canny thresholds, minimum shoreline length, and line simplification. The generic algorithm contains no city coordinates, named water bodies or fixed color palette. This is an experiment: GrabCut can still follow lettering or damage narrow canals, and the polygon and coastline layers have not been manually verified. Always compare against v0.7 before adoption.
+
+## Previous version (v0.7 water refinement)
+
 # CityVisualizer — MapExtractor v0.7 (water refinement)
 
 v0.7 **retains the v0.6 water mask** and adds optional refinement stages, configured through the map-specific water profile (not hardcoded in the extractor):
