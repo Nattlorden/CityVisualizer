@@ -1,3 +1,26 @@
+# CityVisualizer — MapExtractor v0.5 (candidate baseline)
+
+v0.5 promotes the **LAB-normalized** v0.4 mask to an exportable, provisional building-candidate layer. v0.2–v0.4 comparison scripts remain unchanged.
+
+From the project root (Git CMD or PowerShell):
+
+```powershell
+git pull origin main
+.\.venv\Scripts\python.exe MapExtractor\finalize.py --image maps\original\harn_sample.jpeg --config MapExtractor\sample-config.json
+```
+
+Output in `output/buildings_v05/`:
+- `building_mask_v05.png`: corrected binary mask with bottom-frame exclusion;
+- `building_candidates_v05.png`: candidate outlines on the original photo;
+- `building_candidates_v05.geojson`: polygons in **image pixels**, NOT georeferenced;
+- `building_stats_v05.json`: counts and rejection diagnostics.
+
+The example `v05_exclusion_polygons` in `sample-config.json` masks a **narrow lower frame strip** of this specific photographed page, preventing unwanted book-border features from being exported. It is specific to the original **1536 × 1152** photograph; change/remove the coordinates for different source images. The corrected mask is used with the existing v0.2 contour selection thresholds.
+
+The data records `classification: building_candidate`, `review_status: unreviewed`. Candidate geometries may include seating tiers, docks and other non-buildings; large structures (such as the principal temple) may be split. Tiny buildings can remain undetected. **No automatic socio-economic, historical, or building-function classification is applied.** IDs are provisional and may change in future reruns. Do not publish copyrighted original map photos.
+
+## Previous version (v0.4 experimental comparison)
+
 # CityVisualizer — MapExtractor v0.4 (experimental)
 
 v0.4 adds `MapExtractor/color_compare.py` to compare the unchanged v0.2 RGB mask against a second mask made from a locally LAB-normalized photograph. It **does not replace** the existing extraction pipeline or its building IDs.
