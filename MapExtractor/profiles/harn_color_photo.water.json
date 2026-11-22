@@ -121,5 +121,49 @@
     "canny_high": 110,
     "min_length_px": 20,
     "simplify_px": 0.9
+  },
+  "coastal_layers": {
+    "boundary_growth": {
+      "max_distance_px": 12,
+      "local_color_sigma_px": 20,
+      "lab_tolerance": [
+        29,
+        17,
+        18
+      ],
+      "water_hsv_ranges": [
+        {
+          "lower": [
+            69,
+            9,
+            55
+          ],
+          "upper": [
+            117,
+            165,
+            248
+          ]
+        }
+      ],
+      "land_hsv_ranges": [
+        {
+          "lower": [
+            15,
+            75,
+            45
+          ],
+          "upper": [
+            66,
+            255,
+            255
+          ]
+        }
+      ]
+    },
+    "open_boundary_distance_px": 4,
+    "min_segment_length_px": 7,
+    "simplify_px": 0.8,
+    "littoral_band_px": 8,
+    "coastal_land_band_px": 9
   }
 }
