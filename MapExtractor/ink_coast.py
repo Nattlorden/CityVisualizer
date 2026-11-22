@@ -13,8 +13,11 @@ def ink_lines(image, cfg):
     k=int(cfg.get("local_window_px",23))
     if k<3 or k%2==0: raise ValueError("local_window_px must be odd and >=3")
     blurred=cv2.GaussianBlur(gray,(k,k),0)
-    return (((gray.astype(np.int16)<blurred.astype(np.int16)-int(cfg.get("min_dark_contrast",19)))&
-             (gray<int(cfg.get("max_ink_brightness",155)))).astype(np.uint8)*255
+    dark_relative = gray.astype(np.int16) < (
+        blurred.astype(np.int16) - int(cfg.get("min_dark_contrast", 19))
+    )
+    dark_absolute = gray < int(cfg.get("max_ink_brightness", 155))
+    return (dark_relative & dark_absolute).astype(np.uint8) * 255
 
 def color_mask(image, ranges):
     hsv=cv2.cvtColor(image,cv2.COLOR_BGR2HSV)
