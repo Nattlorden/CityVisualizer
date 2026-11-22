@@ -1,3 +1,40 @@
+# CityVisualizer — MapExtractor v0.13: HDR ink connectivity (experimental)
+
+This iteration uses the HDR dark-ink mask **directly**, rather than extracting boundaries of green land regions. It thins linework and proposes connections only between nearby, facing endpoints of different components. Multiple separate coastline segments and islands are allowed. v0.7 remains an unchanged water reference.
+
+Run in Git CMD or PowerShell from the repository root:
+
+```powershell
+git pull origin main
+.\.venv\Scripts\python.exe MapExtractor\ink_connect.py --image maps\original\harn_sample.jpeg --hdr maps\original\harn_sample_hdr.jpeg --profile MapExtractor\profiles\harn_color_photo.water.json
+```
+
+Inspect `output/ink_connect_v013/`:
+
+- `ink_hdr_raw.png`: the original HDR ink detection.
+- `ink_hdr_skeleton.png`: thinned linework before connections.
+- `bridges.png`: new, **unreviewed** gap connections.
+- `ink_hdr_connected.png`: all thinned ink plus bridges.
+- `all_connected_overlay.png`: all connected ink on the HDR image.
+- `coastal_corridor.png`: broad shore/water proximity evidence.
+- `coastal_selection.png` and `coastal_candidates_overlay.png`: separately filtered candidates. Comparing this to the all-connected version reveals when selection discards useful coastline.
+- `land_boundary_candidates_v013.geojson`: ordered graph LineStrings (image pixel coordinates).
+- `bridge_proposals_v013.json`, `stats_v013.json`: traceability.
+
+**Overlay legend:** yellow/orange = detected ink lines; magenta = added gap connections. None are yet confirmed coastal boundaries.
+
+Tune settings in `ink_connect_v013` inside the sample water profile: `max_gap_px` (12), `min_direction_cos` (0.45, stricter means fewer bridges), `max_water_distance_px` (110), and `min_corridor_fraction` (0.2). This is not calibrated to the real HDR map yet; the engine contains no Golotha-specific coordinates.
+
+Synthetic tests:
+
+```powershell
+.\.venv\Scripts\python.exe -m unittest discover -s MapExtractor -p "test_ink_connect.py"
+```
+
+**Limitations:** Crossing lines, longer gaps, map labels and vegetation can still cause false or missed links. The result is a diagnostic proposal, not a verified continuous coast or littoral polygon. v0.7 water is not overwritten. The repository contains a user-committed HDR copy of a book map; avoid redistributing it without appropriate permission.
+
+## Previous version (v0.12)
+
 # CityVisualizer v0.12 — Dual-image land/strand tracing (experimental)
 
 This version compares the original photograph with the user-enhanced HDR photograph and proposes **multiple separate** land-to-beach boundaries: mainland segments, separate islands, and any other sufficiently supported green land regions. It deliberately does NOT assume a single coastline and does NOT modify v0.7 water or synthesize shoreline-zone polygons.
