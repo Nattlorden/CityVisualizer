@@ -1,3 +1,45 @@
+# CityVisualizer v0.14 – Two-sided coastal ink selection (experimental)
+
+The feedback from v0.13 was that `ink_hdr` detects the real coast *and also* houses, trees and lettering. v0.14 **does not change ink detection**. Instead it tests the colors on **opposite sides of each ink pixel**, following the broad local direction of green-land color change. An ink pixel is selected if it separates green land from ochre/sand shore, and lies within a configurable maximum distance of v0.7 water.
+
+This is a **stricter filter**, not a final coastline: it may omit shaded cliffs, quays, rocky beaches or interrupted ink. Keep all diagnostic layers rather than assuming the selection is correct.
+
+Run from the repo root:
+
+```powershell
+git pull origin main
+.\.venv\Scripts\python.exe MapExtractor\ink_coast_select.py --image maps\original\harn_sample.jpeg --hdr maps\original\harn_sample_hdr.jpeg --profile MapExtractor\profiles\harn_color_photo.water.json
+```
+
+Files appear in `output/ink_coast_v014/`:
+
+- `ink_hdr_raw.png`: **unaltered** dark-line detector.
+- `green_color.png`, `shore_color.png`: evidence for opposing sides.
+- `side_score.png`, `side_separation.png`: diagnostic confidence, **not** final coast probabilities.
+- `side_evidence.png`: ink pixels with qualifying opposite-side color contrast.
+- `side_skeleton.png`: thinned selected ink.
+- `bridges.png`: separately stored suggested short links.
+- `connected.png`: selected skeleton plus links.
+- `land_boundary_candidates.png`: filtered, connected candidate pixels.
+- `selection_vs_all_ink.png`: gray = discarded dark ink, red = selected candidate, magenta = unverified gap connection.
+- `hdr_coast_overlay.png` and `original_coast_overlay.png`: same candidates on both original maps.
+- `land_boundary_candidates_v014.geojson`: unreviewed LineStrings; no filled polygons.
+- `stats_v014.json`: counts for raw ink, two-sided qualifying ink, links and final selected pixels.
+
+Tune `ink_coast_v014` in `MapExtractor/profiles/harn_color_photo.water.json`. Most relevant options are `side_offset_px` (11), `color_smoothing_sigma_px` (5), `normal_sigma_px` (11), `min_side_color_fraction` (0.22), `min_side_separation` (0.16), and `max_water_distance_px` (150). To reduce false positives increase `min_side_separation` or `min_side_color_fraction`; to recover a missing valid coast decrease them. Color-range adjustments can affect both.
+
+**Important:** This method focuses on the **green-land / sandy-shore boundary**, not every possible water/land boundary. City edges, quays, completely blue lakes and bare stone need different material-specific rules. Islands are not excluded: each land/shoreside contrast may produce independent segments. v0.7 remains the unchanged outer water reference.
+
+Run the synthetic regression test:
+
+```powershell
+.\.venv\Scripts\python.exe -m unittest discover -s MapExtractor -p "test_ink_coast_select.py"
+```
+
+The thresholds have **not** yet been proven on the real photographed map. Review `selection_vs_all_ink.png` first to see what is lost, not merely what remains.
+
+## Previous version (v0.13)
+
 # CityVisualizer — MapExtractor v0.13: HDR ink connectivity (experimental)
 
 This iteration uses the HDR dark-ink mask **directly**, rather than extracting boundaries of green land regions. It thins linework and proposes connections only between nearby, facing endpoints of different components. Multiple separate coastline segments and islands are allowed. v0.7 remains an unchanged water reference.
