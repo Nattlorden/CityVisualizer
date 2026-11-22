@@ -30,7 +30,7 @@ def infer_water(image, baseline, allowed, ink, cfg):
     reach=int(cfg.get("search_distance_px",40))
     if not 5<=reach<=100:raise ValueError("search_distance_px must be 5..100")
     blue=color_mask(image,cfg.get("water_hsv_ranges",[]))&allowed
-    count,labels,stats,_=cv2.connectedComponentsWithStats((blue>0).astype(np.uint8),8)
+    count,labels,stats,_=cv2.connectedComponentsWithStats((blue>0).astype(np.uint8),connectivity=8)
     supported=np.zeros_like(blue)
     minimum=int(cfg.get("min_blue_component_pixels",9))
     for i in range(1,count):
