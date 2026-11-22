@@ -87,7 +87,8 @@ def coastline_segments(water, permitted, options):
         raise ValueError("Invalid coast boundary settings")
     # A map crop edge is not an actual coastline.
     inside_distance = cv2.distanceTransform(
-        (permitted > 0).astype(np.uint8), cv2.DIST_L2, 3)
+        np.pad((permitted > 0).astype(np.uint8), 1, constant_values=0),
+        cv2.DIST_L2, 3)[1:-1, 1:-1]
     contours, hierarchy = cv2.findContours(water, cv2.RETR_CCOMP,
                                             cv2.CHAIN_APPROX_NONE)
     segments = []
