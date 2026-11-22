@@ -67,7 +67,7 @@ def shore_growth(image, baseline, permitted, settings):
                 (confident_land == 0) & (density > 0.015) & (error <= 1))
     # Keep only newly selected regions joined to baseline water.
     combined = (baseline > 0) | feasible
-    count, labels = cv2.connectedComponents(combined.astype(np.uint8), 8)
+    count, labels = cv2.connectedComponents(combined.astype(np.uint8), connectivity=8)
     touching = np.unique(labels[baseline > 0])
     keep = np.zeros(count, bool)
     keep[touching] = True
