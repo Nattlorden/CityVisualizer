@@ -1,3 +1,43 @@
+# CityVisualizer v0.17 — Conservative geometry audit (experimental)
+
+v0.16's **`hdr_candidate_comparison` is the reference**. This version does **not** change the v0.7 water surface, HDR ink extraction, coast matching, or v0.16 code. It adds a reversible review/cleanup step.
+
+- Long, unsupported straight connectors between v0.16 vertices are split **only if** the connecting pixels have little matching ink in the original HDR mask. A long quay with a genuinely dark straight edge remains untouched.
+- Very sharp, short triangle tips are removed **only** when they also lack supporting HDR ink. Genuine sharply drawn headlands and quays are not automatically smoothed.
+- Small, round v0.7 water components are flagged as **possible causes** of the dotted Pac-Man arcs. Nearby short inner-boundary proposals move into a **review-only GeoJSON layer**, but the lake/water pixels and source v0.16 traces remain unchanged.
+
+Run from repository root (Windows PowerShell or Git CMD):
+
+```powershell
+git pull origin main
+.\.venv\Scripts\python.exe MapExtractor\coast_geometry.py --image maps\original\harn_sample.jpeg --hdr maps\original\harn_sample_hdr.jpeg --profile MapExtractor\profiles\harn_color_photo.water.json
+```
+
+Review `output/coast_geometry_v017/`:
+
+- `hdr_reference_v016.png`: the earlier winning red candidate on HDR, reproduced from v0.16 geometries (without classifications)
+- `hdr_geometry_v017.png`: proposed result: **red** retained candidates, **yellow** small-round-water review candidates, **magenta** flagged unsupported lines or triangle tips, **blue** unchanged v0.7 water edge
+- `geometry_changes_v017.png`: grayscale mask of unsupported shortcuts/tips that v0.17 identified
+- `suspect_round_water_v017.png`: small round *v0.7* outlines which deserve inspection, **not automatically erroneous lakes**
+- `water_v07_unchanged.png`: untouched baseline
+- `coast_candidates_v017.geojson`: retained candidate coastline parts
+- `coast_review_v017.geojson`: quarantined suspect Pac-Man traces, available for restoration
+- `geometry_changes_v017.json`: reason and coordinates of each flagged geometric change
+- `stats_v017.json`: counts and retained version metadata
+
+Settings are in `coast_geometry_v017` in the water profile. `max_unsupported_link_px` defaults to 15; `min_link_ink_fraction` defaults to 0.28; `round_review_radius_px` defaults to 20. All are first-pass conservative values requiring visual validation. If an authentic coastline is flagged, keep v0.16 and adjust parameters rather than deleting the segment.
+
+Run syntax check and the synthetic regression suite:
+
+```powershell
+.\.venv\Scripts\python.exe -m compileall -q MapExtractor
+.\.venv\Scripts\python.exe -m unittest discover -s MapExtractor -p "test_*.py"
+```
+
+**Known limitations:** The small-loop detector infers shape from v0.7; a round water feature may be a legitimate small lake or island. Geometry splitting after simplification cannot repair a fundamentally incorrect choice of dark line. No automatic bay correction or new littoral polygon is claimed. Results are unreviewed.
+
+## Previous version (v0.16)
+
 # CityVisualizer v0.16 — Conservative cleanup and coastal context (experimental)
 
 **v0.15 is preserved and unchanged.** The best result so far is the red coastline on the HDR overlay. This version deliberately keeps that matching algorithm and applies a separate post-processing stage.
