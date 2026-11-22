@@ -414,5 +414,21 @@
     "min_chord_px": 4,
     "spike_span_px": 7,
     "spike_detour_ratio": 2.8
+  },
+  "coast_geometry_v017": {
+    "ink_support_radius_px": 2,
+    "max_unsupported_link_px": 15,
+    "min_link_ink_fraction": 0.28,
+    "min_spur_height_px": 8,
+    "max_spur_base_px": 9,
+    "min_spur_detour_ratio": 2.9,
+    "max_spur_ink_support": 0.2,
+    "round_min_area_px2": 25,
+    "round_max_area_px2": 1800,
+    "round_min_compactness": 0.3,
+    "round_max_aspect_ratio": 2.4,
+    "round_review_radius_px": 20,
+    "round_review_max_line_px": 125,
+    "round_review_fraction": 0.7
   }
 }
