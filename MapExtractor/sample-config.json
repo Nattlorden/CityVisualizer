@@ -1,5 +1,30 @@
 {
-  "roi_polygon": [[28, 155], [335, 117], [1453, 194], [1518, 1014], [320, 1073], [7, 1048]],
+  "roi_polygon": [
+    [
+      28,
+      155
+    ],
+    [
+      335,
+      117
+    ],
+    [
+      1453,
+      194
+    ],
+    [
+      1518,
+      1014
+    ],
+    [
+      320,
+      1073
+    ],
+    [
+      7,
+      1048
+    ]
+  ],
   "thresholds": {
     "min_red": 195,
     "min_green": 185,
@@ -19,9 +44,29 @@
   "v02_filters": {
     "min_area_px": 8,
     "max_area_px": 14000,
-    "min_fill_ratio": 0.20,
+    "min_fill_ratio": 0.2,
     "min_bbox_side_px": 2
   },
   "draw_labels": true,
-  "draw_new_labels": false
+  "draw_new_labels": false,
+  "v05_exclusion_polygons": [
+    [
+      [
+        375,
+        1022
+      ],
+      [
+        1518,
+        1012
+      ],
+      [
+        1528,
+        1100
+      ],
+      [
+        375,
+        1100
+      ]
+    ]
+  ]
 }
