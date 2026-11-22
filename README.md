@@ -1,3 +1,35 @@
+# CityVisualizer — MapExtractor v0.9 (four coastal layers)
+
+v0.9 uses **v0.7 as a stable water baseline** and proposes a conservative land-aware extension. All thresholds, map boundaries and example seed points are profile data; the engine has no city names or fixed geometry. **The four layers are provisional candidate data**, not validated coastlines or seabed information.
+
+From the repository root (Git CMD or PowerShell):
+
+```powershell
+git pull origin main
+.\.venv\Scripts\python.exe MapExtractor\coastal.py --image maps\original\harn_sample.jpeg --profile MapExtractor\profiles\harn_color_photo.water.json
+```
+
+Inspect `output/coastal_v09/coastal_overlay_v09.png` first. Color legend: **blue tint** = detected water; **yellow-green tint** = water-side proximity band; **orange tint** = land-side coastal terrain band; **red line** = candidate shoreline. The additional `added_water_v09.png` shows changes from v0.7 alone.
+
+Four GeoJSON exports (all in **image pixel** coordinates):
+
+- `water_v09.geojson`: water candidates including local color-guided expansion from v0.7;
+- `shoreline_v09.geojson`: LineStrings tracing candidate land/water boundaries, deliberately omitting image and profile clip edges;
+- `littoral_zone_v09.geojson`: provisional water-side proximity zone, **not evidence of shallowness**;
+- `coastal_terrain_v09.geojson`: provisional land-side proximity zone. Material is `unknown` until later classification or manual review.
+
+Additional mask PNGs and `coastal_stats_v09.json` are written for diagnostics. Optional settings are under `coastal_layers` in the water profile. `boundary_growth.max_distance_px` bounds expansion (default in sample: 12); `water_hsv_ranges` and `land_hsv_ranges` are configurable evidence filters. `littoral_band_px` and `coastal_land_band_px` describe image-space bands, **not real-world distances**. Profiles must be recalibrated when using different source maps.
+
+Test without the proprietary image:
+
+```powershell
+.\.venv\Scripts\python.exe -m unittest discover -s MapExtractor -p "test_coastal.py"
+```
+
+**Important limitations:** Shoreline geometry is extracted from the refined mask; it is not yet a reliable vectorization of the cartographer's ink boundary. Missing narrow waterways may remain missing, and island/shore classification remains provisional. Zones are geometry placeholders for future lithology, sand, stones, mixed beaches, reeds and quay segmentation. Do not infer real bathymetry or material from these bands. The reference map photo must stay local (`maps/original/` is ignored by Git).
+
+## Previous version (v0.8 experimental shoreline)
+
 # CityVisualizer — MapExtractor v0.8 (experimental shoreline)
 
 This iteration **does not replace v0.7**. It treats the v0.7 mask as initial water, then uses OpenCV GrabCut inside a narrow editable boundary band to propose a revised shoreline. Image edges are shown separately as diagnostic evidence, not blindly followed (printed labels and piers can also produce dark lines).
