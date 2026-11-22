@@ -165,5 +165,44 @@
     "simplify_px": 0.8,
     "littoral_band_px": 8,
     "coastal_land_band_px": 9
+  },
+  "ink_boundary": {
+    "local_window_px": 23,
+    "min_dark_contrast": 19,
+    "max_ink_brightness": 155,
+    "ink_weight": 0.8,
+    "search_distance_px": 40,
+    "water_hsv_ranges": [
+      {
+        "lower": [
+          71,
+          12,
+          55
+        ],
+        "upper": [
+          119,
+          175,
+          250
+        ]
+      }
+    ],
+    "land_hsv_ranges": [
+      {
+        "lower": [
+          15,
+          90,
+          45
+        ],
+        "upper": [
+          68,
+          255,
+          255
+        ]
+      }
+    ],
+    "min_blue_component_pixels": 9,
+    "map_edge_clearance_px": 4,
+    "min_shore_length_px": 7,
+    "simplify_px": 0.8
   }
 }
