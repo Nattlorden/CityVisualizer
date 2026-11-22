@@ -1,0 +1,70 @@
+{
+  "profile_name": "harn_color_photo_example",
+  "method": "hsv_ranges",
+  "hsv_ranges": [
+    {
+      "lower": [
+        77,
+        15,
+        65
+      ],
+      "upper": [
+        108,
+        130,
+        235
+      ]
+    }
+  ],
+  "median_kernel": 3,
+  "closing_kernel": 3,
+  "min_area_px2": 90,
+  "simplify_fraction": 0.004,
+  "include_polygons": [
+    [
+      [
+        28,
+        155
+      ],
+      [
+        335,
+        117
+      ],
+      [
+        1453,
+        194
+      ],
+      [
+        1518,
+        1014
+      ],
+      [
+        320,
+        1073
+      ],
+      [
+        7,
+        1048
+      ]
+    ]
+  ],
+  "exclude_polygons": [
+    [
+      [
+        375,
+        1022
+      ],
+      [
+        1518,
+        1012
+      ],
+      [
+        1528,
+        1100
+      ],
+      [
+        375,
+        1100
+      ]
+    ]
+  ]
+}
