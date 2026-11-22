@@ -1,3 +1,30 @@
+# CityVisualizer — MapExtractor v0.7 (water refinement)
+
+v0.7 **retains the v0.6 water mask** and adds optional refinement stages, configured through the map-specific water profile (not hardcoded in the extractor):
+
+1. `shore_refinement`: detect pixels matching a wider HSV range **only within `distance_px` of existing water**.
+2. `seeded_water`: seeded flood-fill in LAB around user-selected points, constrained by a local radius and the profile's map exclusions.
+
+From the project directory, after `git pull origin main`:
+
+```powershell
+.\.venv\Scripts\python.exe MapExtractor\water_refine.py --image maps\original\harn_sample.jpeg --profile MapExtractor\profiles\harn_color_photo.water.json
+```
+
+Output in `output/water_v07/`: `water_mask_v07.png`, `water_overlay_v07.png`, `water_new_shore_v07.png`, `water_seeded_v07.png`, `water_candidates_v07.geojson`, `water_stats_v07.json`.
+
+Overlay legend: **blue** original v0.6 water, **green** added shoreline, **orange** seeded areas. Boundaries are outlined in blue. If the added shoreline includes land, reduce `shore_refinement.distance_px` (currently 7) or tighten its HSV range. If seeded water includes marshland, lower the `lab_tolerance` array or reduce `max_radius_px`. `seeded_water.points` are **example pixel coordinates for this photograph only**. Set `points: []` when processing an unrelated map. The profile is a starting point and must be visually reviewed.
+
+Run the synthetic, map-independent smoke test:
+
+```powershell
+.\.venv\Scripts\python.exe MapExtractor\test_water_refine.py
+```
+
+**Limitations:** v0.7 is still provisional; narrow waterways may remain disconnected and some shorelines may be offset. Seed points are a temporary route to mapping isolated ponds; they are not an automatic monochrome map solution. Another map can reuse the engine with a newly prepared profile, while B/W maps will require another detector. No original copyrighted source map is included in the public repository.
+
+## Previous version (v0.6 water candidates)
+
 # CityVisualizer — MapExtractor v0.6 (water candidates)
 
 The **water layer** is independent from the v0.5 building layer. Detection logic lives in `MapExtractor/water.py`; **map-specific HSV thresholds and spatial limits** live in replaceable JSON profiles. Example profile: `MapExtractor/profiles/harn_color_photo.water.json`.
