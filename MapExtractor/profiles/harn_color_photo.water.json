@@ -247,5 +247,47 @@
     "min_component_pixels": 7,
     "min_line_length_px": 6,
     "simplify_px": 0.65
+  },
+  "land_boundary_v012": {
+    "green_hsv_ranges": [
+      {
+        "lower": [
+          19,
+          35,
+          43
+        ],
+        "upper": [
+          89,
+          255,
+          255
+        ]
+      }
+    ],
+    "sand_hsv_ranges": [
+      {
+        "lower": [
+          8,
+          12,
+          65
+        ],
+        "upper": [
+          36,
+          210,
+          255
+        ]
+      }
+    ],
+    "ink_window": 19,
+    "ink_contrast": 13,
+    "ink_max": 155,
+    "green_smooth_px": 3,
+    "min_land_area_px2": 175,
+    "sand_near_px": 10,
+    "water_near_px": 75,
+    "ink_near_px": 3,
+    "edge_clearance_px": 3,
+    "min_run_points": 10,
+    "min_line_length_px": 15,
+    "simplify_px": 0.75
   }
 }
