@@ -356,5 +356,23 @@
     "bridge_corridor_px": 8,
     "min_component_pixels": 12,
     "min_trace_length_px": 8
+  },
+  "coast_guided_v015": {
+    "sample_step_px": 4,
+    "tangent_half_window": 3,
+    "normal_probe_px": 5,
+    "min_offset_px": 4,
+    "max_offset_px": 85,
+    "ink_search_radius_px": 1,
+    "map_edge_clearance_px": 5,
+    "min_contour_points": 40,
+    "max_step_offset_change_px": 18,
+    "distance_jump_penalty": 0.13,
+    "distance_penalty": 0.025,
+    "gap_penalty": 1.65,
+    "ink_reward": 2.6,
+    "min_supported_samples": 8,
+    "min_segment_length_px": 14,
+    "simplify_px": 0.8
   }
 }
