@@ -1,3 +1,30 @@
+# CityVisualizer — MapExtractor v0.11: separate inner land boundary (experimental)
+
+v0.11 adds `MapExtractor/land_boundary.py`. **Keep v0.7 as the outer shore-zone / water transition**, and separately detect **dark ink at the green-land / sand-colored shoreline transition** as candidate inner boundaries. This does **not** modify water, rebuild the coast, or generate a closed littoral polygon.
+
+From the repository root, in Git CMD or PowerShell:
+
+```powershell
+git pull origin main
+.\.venv\Scripts\python.exe MapExtractor\land_boundary.py --image maps\original\harn_sample.jpeg --profile MapExtractor\profiles\harn_color_photo.water.json
+```
+
+Review `output/land_boundary_v011/inner_vs_outer_v011.png`: **blue** = unchanged outer water edge (v0.7); **red** = independent, *unreviewed* candidate inner land contours from dark ink. See `inner_boundary_candidates.png` and `land_edge_evidence.png` to understand the detection. `land_boundary_v011.geojson` contains fragments as LineStrings in **image pixel coordinates**. `stats_v011.json` counts fragments, not verified shorelines.
+
+The sample profile's `land_boundary_v011` section contains the adjustable green-land, sand-colored zone and ink thresholds. All source-image-specific settings belong in the JSON, **not in the extractor**. **Known limitations:** fragments are disconnected; many buildings, trees and other printed marks may still be proposed. Very pale or uninked shore portions are omitted. This is an *ink candidate diagnostic*, **not an accurate continuous tracing of the cartographer's line**. In particular we do not infer a filled polygon between inner and outer boundaries until those lines have been validated and connected. A true ink-following graph tracer / manual editing tool is a later step.
+
+Optional `--water-mask output/water_v07/water_mask_v07.png` uses an already saved v0.7 mask instead of recomputing it; the mask must match the original photo dimensions.
+
+Synthetic check:
+
+```powershell
+.\.venv\Scripts\python.exe -m unittest discover -s MapExtractor -p "test_land_boundary.py"
+```
+
+Only a local exploratory test on the original photograph with a **v0.6 approximation** of the outer water mask has been completed before publication, not a complete v0.7-integrated verification. Compare the resulting red fragments against the dark land contour, especially the two previously highlighted regions. Do not treat the exported fragments as finalized shoreline.
+
+## Previous version (v0.10 ink-informed water)
+
 # CityVisualizer — MapExtractor v0.10: ink-informed shoreline (experimental)
 
 This version tests **dark map linework as a shoreline boundary cue**, using color evidence to seed water versus land. It builds on the v0.7 water baseline, but unlike v0.9 it allows region classification beyond the previous narrow shore band. The method remains probabilistic: dark strokes can be text, buildings, piers and marsh symbols.
