@@ -313,5 +313,48 @@
     "min_component_pixels": 25,
     "min_corridor_fraction": 0.2,
     "min_trace_length_px": 8
+  },
+  "ink_coast_v014": {
+    "green_hsv_ranges": [
+      {
+        "lower": [
+          19,
+          35,
+          43
+        ],
+        "upper": [
+          89,
+          255,
+          255
+        ]
+      }
+    ],
+    "shore_hsv_ranges": [
+      {
+        "lower": [
+          8,
+          12,
+          65
+        ],
+        "upper": [
+          36,
+          210,
+          255
+        ]
+      }
+    ],
+    "color_smoothing_sigma_px": 5,
+    "normal_sigma_px": 11,
+    "side_offset_px": 11,
+    "min_normal_strength": 0.045,
+    "min_side_color_fraction": 0.22,
+    "min_side_separation": 0.16,
+    "max_water_distance_px": 150,
+    "max_gap_px": 10,
+    "direction_radius_px": 6,
+    "min_direction_cos": 0.55,
+    "bridge_corridor_px": 8,
+    "min_component_pixels": 12,
+    "min_trace_length_px": 8
   }
 }
