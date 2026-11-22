@@ -289,5 +289,29 @@
     "min_run_points": 10,
     "min_line_length_px": 15,
     "simplify_px": 0.75
+  },
+  "ink_connect_v013": {
+    "max_gap_px": 12,
+    "direction_radius_px": 6,
+    "min_direction_cos": 0.45,
+    "max_water_distance_px": 110,
+    "shore_hsv_ranges": [
+      {
+        "lower": [
+          7,
+          10,
+          50
+        ],
+        "upper": [
+          43,
+          210,
+          255
+        ]
+      }
+    ],
+    "shore_evidence_radius_px": 18,
+    "min_component_pixels": 25,
+    "min_corridor_fraction": 0.2,
+    "min_trace_length_px": 8
   }
 }
