@@ -374,5 +374,45 @@
     "min_supported_samples": 8,
     "min_segment_length_px": 14,
     "simplify_px": 0.8
+  },
+  "coast_refine_v016": {
+    "natural_hsv_ranges": [
+      {
+        "lower": [
+          19,
+          32,
+          43
+        ],
+        "upper": [
+          89,
+          255,
+          255
+        ]
+      }
+    ],
+    "built_hsv_ranges": [
+      {
+        "lower": [
+          0,
+          0,
+          35
+        ],
+        "upper": [
+          23,
+          180,
+          255
+        ]
+      }
+    ],
+    "context_radius_px": 10,
+    "natural_min_fraction": 0.18,
+    "built_min_fraction": 0.22,
+    "type_margin": 1.25,
+    "min_reliable_length_px": 28,
+    "built_review_length_px": 65,
+    "winding_review_threshold": 4,
+    "min_chord_px": 4,
+    "spike_span_px": 7,
+    "spike_detour_ratio": 2.8
   }
 }
