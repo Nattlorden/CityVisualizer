@@ -1,4 +1,25 @@
-# CityVisualizer — MapExtractor v0.2
+# CityVisualizer — MapExtractor v0.3
+
+v0.3 adds **diagnostic visualizations only**. The v0.2 extraction logic, original image mask, and filters are unchanged.
+
+## Run diagnostics (PowerShell or Git CMD)
+
+From the repository root, with the book photograph stored **locally** as `maps/original/harn_sample.jpeg`:
+
+```powershell
+.\.venv\Scripts\python.exe MapExtractor\diagnostics.py --image maps\original\harn_sample.jpeg --config MapExtractor\sample-config.json
+```
+
+Outputs are written to `output/diagnostics_v03/`:
+- `east_small_buildings_baseline.png` and `east_small_buildings_v03.png`
+- `central_city_baseline.png` and `central_city_v03.png`
+- `diagnostic_stats.json` with counts per crop.
+
+**Legend:** red = v0.1 candidate; yellow = added in v0.2; magenta = still rejected in v0.2. Crops are enlarged 3x with nearest-neighbor interpolation; this is a diagnostic overlay, not a new selection. Regions are fixed image-pixel rectangles for the supplied example and can be overridden by adding a `diagnostic_regions` object to your local config; coordinates are `[x1,y1,x2,y2]`.
+
+**Note:** Only contours already represented in the v0.2 binary mask can be displayed as candidates or rejections. Missing mask components will require later work on segmentation. Region totals use contour bounding-box centers; they depend on the crop boundaries.
+
+## Previous extraction (v0.2)
 
 v0.2 changes **only the final contour selection thresholds**. The mask computation is unchanged from v0.1. This makes it easy to evaluate whether the small buildings already visible in the mask are recovered when the selection rules are relaxed.
 
