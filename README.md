@@ -1,3 +1,27 @@
+# CityVisualizer v0.12 — Dual-image land/strand tracing (experimental)
+
+This version compares the original photograph with the user-enhanced HDR photograph and proposes **multiple separate** land-to-beach boundaries: mainland segments, separate islands, and any other sufficiently supported green land regions. It deliberately does NOT assume a single coastline and does NOT modify v0.7 water or synthesize shoreline-zone polygons.
+
+From the repository root, after `git pull origin main`:
+
+```powershell
+.\.venv\Scripts\python.exe MapExtractor\land_boundary_dual.py --image maps\original\harn_sample.jpeg --hdr maps\original\harn_sample_hdr.jpeg --profile MapExtractor\profiles\harn_color_photo.water.json
+```
+
+Compare `output/land_boundary_v012/original_overlay.png` and `hdr_overlay.png`. Both use **exactly the same extracted boundary candidates**: yellow indicates greater support from nearby dark ink (at least 0.35), red less support. `land_boundary_v012.geojson` stores separate unreviewed LineStrings, source-component IDs and whether an extracted contour segment forms a closed ring. Diagnostic masks include `green_original.png`, `green_hdr.png`, `green_consensus.png`, `sand_evidence.png`, `ink_original.png`, `ink_hdr.png`, `land_regions.png`, and `water_v07_reference.png`. The count of separate source components and traces appears in `stats_v012.json`.
+
+`MapExtractor/profiles/harn_color_photo.water.json` contains image-specific color thresholds and a bounded search radius. The implementation accepts any pair of aligned images with the same dimensions; a different map needs its own profile. The current profile is a first approximation, **not calibrated** or verified with the new HDR photograph. HDR contrast can increase unwanted lines from vegetation and buildings.
+
+**Critical limitations:** These are contours of *inferred green areas*, not guaranteed traces of the original black ink. They may be shifted from ink or interrupted by trees, and closed loops can include false positives. The reported island components are *candidate regions*, not confirmed island classifications. Map-edge artifacts are suppressed rather than described as actual coast. The image must remain in its original pixel coordinate system; v0.7 still determines the outer water transition. We must visually evaluate these overlays before using any results as real 3D geometry.
+
+All regression tests can be run locally with:
+
+```powershell
+.\.venv\Scripts\python.exe -m unittest discover -s MapExtractor -p "test_*.py"
+```
+
+## Previous version (v0.11)
+
 # CityVisualizer — MapExtractor v0.11: separate inner land boundary (experimental)
 
 v0.11 adds `MapExtractor/land_boundary.py`. **Keep v0.7 as the outer shore-zone / water transition**, and separately detect **dark ink at the green-land / sand-colored shoreline transition** as candidate inner boundaries. This does **not** modify water, rebuild the coast, or generate a closed littoral polygon.
