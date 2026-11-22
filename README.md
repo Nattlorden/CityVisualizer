@@ -1,3 +1,27 @@
+# CityVisualizer — MapExtractor v0.6 (water candidates)
+
+The **water layer** is independent from the v0.5 building layer. Detection logic lives in `MapExtractor/water.py`; **map-specific HSV thresholds and spatial limits** live in replaceable JSON profiles. Example profile: `MapExtractor/profiles/harn_color_photo.water.json`.
+
+From the project root after `git pull origin main`:
+
+```powershell
+.\.venv\Scripts\python.exe MapExtractor\water.py --image maps\original\harn_sample.jpeg --profile MapExtractor\profiles\harn_color_photo.water.json
+```
+
+Outputs in `output/water_v06/`:
+- `water_mask_v06.png`: binary color-based water mask;
+- `water_candidates_v06.png`: provisional blue outlines on original;
+- `water_candidates_v06.geojson`: polygons, potentially with holes, in **image pixel coordinates**;
+- `water_stats_v06.json`: simple diagnostics.
+
+**Important:** All water objects are `water_candidate` and `unreviewed`; the method may mistake roofs, shadows, vegetation or printed text for water and may fragment canals. This is a first-pass, *not a validated coastline*. The provided color profile is calibrated only approximately for our test photograph; different maps need different profiles. `include_polygons` and `exclude_polygons` refer to that image's pixel coordinates and are optional. Remove them or redraw them for any other image, especially scanned pages with different dimensions. The engine has no fixed city-specific coordinates.
+
+**Black-and-white maps:** HSV color detection does not apply. A future method will combine linework, textures, region connectivity and user seed points, while retaining the same GeoJSON water-layer output. We have deliberately not imposed a blue-color assumption on the data model.
+
+No original Hârn map image is committed to this public repository. Do not commit `maps/original/`.
+
+## Previous version (v0.5 buildings)
+
 # CityVisualizer — MapExtractor v0.5 (candidate baseline)
 
 v0.5 promotes the **LAB-normalized** v0.4 mask to an exportable, provisional building-candidate layer. v0.2–v0.4 comparison scripts remain unchanged.
