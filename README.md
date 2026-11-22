@@ -1,3 +1,38 @@
+# CityVisualizer v0.16 — Conservative cleanup and coastal context (experimental)
+
+**v0.15 is preserved and unchanged.** The best result so far is the red coastline on the HDR overlay. This version deliberately keeps that matching algorithm and applies a separate post-processing stage.
+
+From the repository root:
+
+```powershell
+git pull origin main
+.\.venv\Scripts\python.exe MapExtractor\coast_refine.py --image maps\original\harn_sample.jpeg --hdr maps\original\harn_sample_hdr.jpeg --profile MapExtractor\profiles\harn_color_photo.water.json
+```
+
+Outputs in `output/coast_refined_v016/`:
+
+- `hdr_refined_overlay.png`: **green** = candidate natural coast, **orange/blue** = candidate built quay/coast, **red** = segments requiring review. **Blue** thin outer line = unchanged v0.7 reference.
+- `original_refined_overlay.png`: same candidates on the original photograph.
+- `hdr_candidate_comparison.png`: same candidate geometry in red for direct comparison against v0.15.
+- `review_required.png`: grayscale mask of uncertain and short candidates.
+- `water_v07_unchanged.png`: proof that v0.7 remains an untouched outer reference.
+- `coast_candidates_v016.geojson`: pixel-coordinate LineStrings with `type`, `confidence`, `review_status`, and review reasons including possible quay spurs.
+- `stats_v016.json`: counts per provisional terrain class.
+
+v0.16 does **not** claim to fill missing bays. Where v0.7 misses a bay or its normal points the wrong way, the inner edge may still be wrong or absent; suspicious twists and short runs are flagged for review. Short, clearly backtracking spikes can be pruned without flattening legitimate headlands. Natural versus built coast is a *context-dependent candidate label*, not a verified shoreline type. Water and littoral polygons are unchanged; no new coastland polygon is inferred.
+
+Set thresholds under `coast_refine_v016` in the existing water profile. Important controls: `spike_span_px` (maximum short artifact width), `spike_detour_ratio`, `min_reliable_length_px`, `built_review_length_px`, `winding_review_threshold`, and HSV ranges for natural/built surroundings.
+
+Tests (synthetic only):
+
+```powershell
+.\.venv\Scripts\python.exe -m unittest discover -s MapExtractor -p "test_coast_refine.py"
+```
+
+The first evaluation should compare `hdr_refined_overlay.png` with the **successful v0.15** `hdr_overlay.png` near the southern wooded shore and harbor, rather than assuming an improved result. This version is still unreviewed.
+
+## Previous version (v0.15)
+
 # CityVisualizer v0.15 — Water-guided HDR ink matching (experimental)
 
 This approach uses the v0.7 water-mask boundary as the **starting reference** for finding the separate, darker **inner land/shore boundary** in the HDR image. It does **not** alter or relabel the v0.7 water boundary.
