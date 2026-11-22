@@ -1,3 +1,40 @@
+# CityVisualizer v0.15 — Water-guided HDR ink matching (experimental)
+
+This approach uses the v0.7 water-mask boundary as the **starting reference** for finding the separate, darker **inner land/shore boundary** in the HDR image. It does **not** alter or relabel the v0.7 water boundary.
+
+For every separate water contour (including hole boundaries around islands), it samples points and determines the normal pointing away from water. It searches along each normal for HDR dark-ink intersections. Dynamic programming chooses a relatively continuous series of distances, preferring nearby ink without permitting large sudden jumps. Where no plausible ink exists, it emits a **gap**, not an invented coast segment. Separate contours stay separate.
+
+Run from repo root:
+
+```powershell
+git pull origin main
+.\.venv\Scripts\python.exe MapExtractor\coast_guided.py --image maps\original\harn_sample.jpeg --hdr maps\original\harn_sample_hdr.jpeg --profile MapExtractor\profiles\harn_color_photo.water.json
+```
+
+Inspect `output/coast_guided_v015/`:
+
+- `original_overlay.png`, `hdr_overlay.png`: **blue** = outer v0.7 water edge, **yellow** = individual accepted HDR-ink intersection hits, **red** = provisional joined inner-shore segments.
+- `selected_ink_hits.png`: chosen ink hits without background.
+- `sampled_rays.png`: sparse sampling normals (for debugging, not coast geometry).
+- `ink_hdr_raw.png`: unchanged HDR ink detector input; can still include all text, houses and trees.
+- `water_v07.png`: baseline reference.
+- `land_boundary_v015.geojson`: unreviewed inner boundary LineStrings in original image pixel coordinates.
+- `stats_v015.json`: candidate counts and missing matched samples.
+
+Tune `coast_guided_v015` in `MapExtractor/profiles/harn_color_photo.water.json`: `min_offset_px` skips the water-edge ink; `max_offset_px` defines the maximum possible beach width; `sample_step_px` controls contour sampling; `distance_jump_penalty` and `max_step_offset_change_px` control continuity; `gap_penalty` and `ink_reward` control the decision to accept ink versus leave an unknown gap. All settings are initial guesses, **not calibrated** on this actual Hârn image.
+
+Optional: `--water-mask path/to/a/saved-v07-mask.png` uses an existing mask in the source image's pixel dimensions.
+
+Regression tests (synthetic map with a true dark coast and a farther building; and an actual gap):
+
+```powershell
+.\.venv\Scripts\python.exe -m unittest discover -s MapExtractor -p "test_coast_guided.py"
+```
+
+**Limitations:** Proximity alone does not identify semantic geography. A house or quay may still win if its line is closer and similarly continuous. The first detected dark line is not guaranteed to be the green-land/shore contour; curved/narrow banks can make normal direction ambiguous. Only visually validated results should be used for downstream geometry. This experiment creates no enclosed beach polygons and requires no manual seed clicks.
+
+## Previous versions
+
 # CityVisualizer v0.14 – Two-sided coastal ink selection (experimental)
 
 The feedback from v0.13 was that `ink_hdr` detects the real coast *and also* houses, trees and lettering. v0.14 **does not change ink detection**. Instead it tests the colors on **opposite sides of each ink pixel**, following the broad local direction of green-land color change. An ink pixel is selected if it separates green land from ochre/sand shore, and lies within a configurable maximum distance of v0.7 water.
