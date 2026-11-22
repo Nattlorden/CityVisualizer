@@ -1,3 +1,30 @@
+# CityVisualizer — MapExtractor v0.10: ink-informed shoreline (experimental)
+
+This version tests **dark map linework as a shoreline boundary cue**, using color evidence to seed water versus land. It builds on the v0.7 water baseline, but unlike v0.9 it allows region classification beyond the previous narrow shore band. The method remains probabilistic: dark strokes can be text, buildings, piers and marsh symbols.
+
+**Run from the repo root** (Git CMD or PowerShell):
+
+```powershell
+git pull origin main
+.\.venv\Scripts\python.exe MapExtractor\ink_coast.py --image maps\original\harn_sample.jpeg --profile MapExtractor\profiles\harn_color_photo.water.json
+```
+
+Inspect `output/ink_coast_v010/ink_coast_overlay_v010.png`. **Green** = proposed new water compared with v0.7; **magenta** = water removed; **yellow** = shoreline candidate with stronger nearby ink evidence; **red** = lower ink support. The dark-ink diagnostic is `ink_candidates_v010.png`. Blue-candidate seeds are shown in `blue_candidates_v010.png`. Other outputs include `water_mask_v010.png`, `v07_baseline_v010.png`, `water_v010.geojson`, `shoreline_v010.geojson`, and `stats_v010.json`.
+
+`littoral_zone_v010.geojson` and `coastal_terrain_v010.geojson` intentionally contain **no fabricated geometries**. A visually lighter band is not by itself proof of shallow water; we will add separate evidence-based segmentation later. Beach materials (sand, stones, mixed) are also **not inferred** in this version.
+
+The example profile's `ink_boundary` section controls local darkness, seed color ranges, maximum search distance and minimum shoreline length. No Hârn-specific coordinates are embedded in the algorithm; the profile still contains image-specific seed points and crop regions. All GeoJSON remains in **image pixel coordinates**, and all features are **unreviewed**. A black stroke may be misidentified as coastline. Lakes, islands, open map borders and narrow channels require manual inspection, especially on the photographed reference.
+
+Synthetic smoke tests (no copyrighted maps):
+
+```powershell
+.\.venv\Scripts\python.exe -m unittest discover -s MapExtractor -p "test_ink_coast.py"
+```
+
+These tests and code have been published but **a full local v0.10 run against the user's photograph has not yet been verified**. Compare the result with v0.7 and v0.9 before adopting this mask for 3D generation. No original Hârn image is stored in the public repo.
+
+## Previous version (v0.9)
+
 # CityVisualizer — MapExtractor v0.9 (four coastal layers)
 
 v0.9 uses **v0.7 as a stable water baseline** and proposes a conservative land-aware extension. All thresholds, map boundaries and example seed points are profile data; the engine has no city names or fixed geometry. **The four layers are provisional candidate data**, not validated coastlines or seabed information.
