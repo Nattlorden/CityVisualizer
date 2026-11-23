@@ -1,3 +1,50 @@
+# CityVisualizer — coastal checkpoint after v0.20
+
+**Decision point:** v0.16 `hdr_candidate_comparison.png` is the best *user-verified* baseline. v0.17 and v0.18 did not demonstrate meaningful improvements. Two final, experimental attempts were added: v0.19 diagnostics and v0.20 targeted, reversible selection. Neither replaces v0.16 unless visual comparison shows a clear improvement. This is a deliberate pause point for coastal extraction.
+
+## v0.19 — non-destructive diagnostics
+
+```powershell
+git pull origin main
+.\.venv\Scripts\python.exe MapExtractor\coast_diagnose.py --image maps\original\harn_sample.jpeg --hdr maps\original\harn_sample_hdr.jpeg --profile MapExtractor\profiles\harn_color_photo.water.json
+```
+
+Review `output/coast_diagnostic_v019/water_component_ids.png`: independent small water shapes are boxed and identified. `v016_with_unsupported_links.png` shows weak-ink links in magenta over the unchanged red v0.16 candidate. `diagnosis_v019.json` records water component areas and possible unsupported match connections.
+
+## v0.20 — final conservative candidate experiment
+
+```powershell
+.\.venv\Scripts\python.exe MapExtractor\coast_checkpoint.py --image maps\original\harn_sample.jpeg --hdr maps\original\harn_sample_hdr.jpeg --profile MapExtractor\profiles\harn_color_photo.water.json
+```
+
+Review these side-by-side in `output/coast_checkpoint_v020/`:
+
+- `hdr_reference_v016.png`: red lines from v0.16, unchanged
+- `hdr_candidate_v020.png`: proposed red coastal candidates **without review-only small-water lines**, and with only strongly unsupported inland triangle tips omitted
+- `hdr_review_v020.png`: same proposed red geometry plus **yellow** review-only lines near independent little water components
+- `small_water_components.png`: isolated small water bodies used as evidence, not a land classification
+- `coast_candidates_v020.geojson`: surviving lines
+- `review_small_water_v020.geojson`: excluded candidates retained for recovery
+- `triangle_changes_v020.json`: original source IDs and deleted-tip coordinates
+- `water_v07_unchanged.png`: original water pixels, always preserved
+
+The appearance of extra yellow is **not an improvement**; it only makes uncertainty visible. Success requires fewer false triangles and missing Pac-Man candidates in the main red layer **without losing correct natural coastline, islands or sharp quays**. If the side-by-side review fails this standard, **retain v0.16**.
+
+The user-supplied photographs remain source material; do not add new copies to the repository. Existing Git history may already contain one user-pushed HDR photograph.
+
+### Validation and future work
+
+```powershell
+.\.venv\Scripts\python.exe -m compileall -q MapExtractor
+.\.venv\Scripts\python.exe -m unittest discover -s MapExtractor -p "test_coast_*.py"
+```
+
+Synthetic tests were added for water component labeling, ink support, small water review, triangle trimming and preserved ink-supported quays. Results on the real photographed map have **not** yet been independently verified; inspect the output before accepting any new baseline.
+
+When resuming: review the small marsh water component IDs and any incorrectly tagged island, study why v0.7 misses east-side bays, add manual control points only where genuinely needed, and avoid general image-color threshold retuning that previously destroyed good coastlines.
+
+## Previous development log
+
 # CityVisualizer v0.18 — Matching geometry, not post-cleanup (experimental)
 
 Retains **v0.16 `hdr_candidate_comparison` as the visual reference**. This version adjusts the candidate-selection stage itself, while leaving v0.7 water, v0.15, v0.16 and v0.17 untouched.
