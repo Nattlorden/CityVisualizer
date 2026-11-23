@@ -444,5 +444,16 @@
     "small_water_area_px": 2400,
     "inspect_link_longer_than_px": 11,
     "inspect_link_below_ink_fraction": 0.38
+  },
+  "coast_checkpoint_v020": {
+    "small_water_min_area_px": 24,
+    "small_water_max_area_px": 2500,
+    "small_water_near_px": 17,
+    "small_water_review_max_line_px": 130,
+    "small_water_near_fraction": 0.7,
+    "triangle_max_base_px": 14,
+    "triangle_min_height_px": 6,
+    "triangle_min_inland_px": 4,
+    "triangle_max_ink_support": 0.18
   }
 }
