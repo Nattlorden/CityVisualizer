@@ -472,5 +472,17 @@
     "gate_min_gap_area_px2": 3,
     "regions": [],
     "exclude_regions": []
+  },
+  "fortifications_v022": {
+    "black_gray_max": 75,
+    "black_open_radius": 0,
+    "min_tower_area_px": 20,
+    "max_tower_area_px": 3000,
+    "min_tower_black_fraction": 0.55,
+    "tower_water_proximity_px": null,
+    "anchor_reach_px": 5,
+    "max_trace_steps": 650,
+    "min_wall_trace_length_px": 17,
+    "branch_degree_stop": 5
   }
 }
