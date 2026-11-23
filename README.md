@@ -1,3 +1,33 @@
+# CityVisualizer v0.21 — Fortifications (first diagnostic pass)
+
+The coastline work is paused: **v0.16 `hdr_candidate_comparison` stays the accepted coast baseline**. New work begins on distinct fortification classes:
+
+1. `wall_segment_candidate` — elongated or thick continuous dark masonry, not yet verified as walls.
+2. `tower_or_bastion_candidate` — locally thicker dark structure, which may turn out to be towers, gates, buildings, or ordinary wall junctions.
+3. `possible_wall_gap_not_verified_gate` — small light interruptions between dark stretches. **A gap is not proof of a gate.**
+4. `possible_fortification_building` — a large roof-colored building candidate close to wall-like masonry. Size and adjacency alone do not establish military purpose.
+
+Use the HDR photo to emphasize dark walls; do **not** run on the previously generated coast overlay (which contains artificial black/red/blue marks).
+
+```powershell
+git pull origin main
+.\.venv\Scripts\python.exe MapExtractor\fortifications.py --image maps\original\harn_sample_hdr.jpeg --profile MapExtractor\profiles\harn_color_photo.water.json --building-config MapExtractor\sample-config.json
+```
+
+Inspect `output/fortifications_v021/fortification_candidates_overlay.png`. Color coding is **blue** wall candidates, **magenta** potential towers/thickenings, **yellow** possible gate gaps, and **green** large possible fortification buildings. Separate PNG diagnostic masks and GeoJSON candidate polygons are written for every type. `stats_v021.json` contains preliminary counts. Geometries are in **image pixel coordinates**.
+
+**Very important:** The v0.21 detector is intentionally broad. Dark roads, map text, urban house outlines and vegetation can still be selected. The first run is to assess the dark masonry mask, **not** an accurate fortified-city segmentation. The profile's `fortifications_v021.regions` can optionally restrict analysis to selected fortification neighborhoods, using image pixel polygons. The code contains no map-specific coordinates. Tower, gate, or fortification-building labels are unreviewed suggestions.
+
+Initial synthetic checks:
+
+```powershell
+.\.venv\Scripts\python.exe -m unittest discover -s MapExtractor -p "test_fortifications.py"
+```
+
+The source photograph has not yet been used to validate those semantic labels. Next steps after inspecting the overlay are to identify a few reliably fortified wall segments as structural seeds, trace the connected defensive perimeter, and only then propose attached towers, gates, and building sections. Keep fortification buildings as polygons and walls as separate connected geometry, not as a single undifferentiated dark mask.
+
+## Earlier coastal checkpoint
+
 # CityVisualizer — coastal checkpoint after v0.20
 
 **Decision point:** v0.16 `hdr_candidate_comparison.png` is the best *user-verified* baseline. v0.17 and v0.18 did not demonstrate meaningful improvements. Two final, experimental attempts were added: v0.19 diagnostics and v0.20 targeted, reversible selection. Neither replaces v0.16 unless visual comparison shows a clear improvement. This is a deliberate pause point for coastal extraction.
