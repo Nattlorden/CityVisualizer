@@ -430,5 +430,14 @@
     "round_review_radius_px": 20,
     "round_review_max_line_px": 125,
     "round_review_fraction": 0.7
+  },
+  "coast_matching_v018": {
+    "ink_support_radius_px": 2,
+    "max_point_step_px": 35,
+    "verify_step_from_px": 10,
+    "min_ink_link_fraction": 0.28,
+    "small_water_min_area_px2": 30,
+    "small_water_max_area_px2": 2200,
+    "small_water_min_circularity": 0.32
   }
 }
