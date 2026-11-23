@@ -455,5 +455,22 @@
     "triangle_min_height_px": 6,
     "triangle_min_inland_px": 4,
     "triangle_max_ink_support": 0.18
+  },
+  "fortifications_v021": {
+    "absolute_dark_max": 70,
+    "opening_radius_px": 2,
+    "wall_min_halfwidth_px": 1.5,
+    "tower_min_halfwidth_px": 4.5,
+    "restore_wall_radius_px": 2,
+    "restore_tower_radius_px": 4,
+    "building_wall_proximity_px": 8,
+    "large_building_area_px2": 250,
+    "min_wall_contact_pixels": 5,
+    "gate_max_half_gap_px": 4,
+    "wall_min_area_px2": 20,
+    "tower_min_area_px2": 18,
+    "gate_min_gap_area_px2": 3,
+    "regions": [],
+    "exclude_regions": []
   }
 }
