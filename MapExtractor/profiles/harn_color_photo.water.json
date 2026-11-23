@@ -439,5 +439,10 @@
     "small_water_min_area_px2": 30,
     "small_water_max_area_px2": 2200,
     "small_water_min_circularity": 0.32
+  },
+  "coast_diagnostic_v019": {
+    "small_water_area_px": 2400,
+    "inspect_link_longer_than_px": 11,
+    "inspect_link_below_ink_fraction": 0.38
   }
 }
