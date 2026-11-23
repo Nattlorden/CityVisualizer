@@ -483,6 +483,8 @@
     "anchor_reach_px": 5,
     "max_trace_steps": 650,
     "min_wall_trace_length_px": 17,
-    "branch_degree_stop": 5
+    "branch_degree_stop": 5,
+    "min_forward_alignment": 0.35,
+    "branch_alignment_margin": 0.22
   }
 }
