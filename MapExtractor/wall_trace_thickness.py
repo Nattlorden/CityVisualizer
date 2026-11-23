@@ -133,7 +133,7 @@ def starting_frontier(skeleton, seeds, evidence, cfg):
 
 
 def next_candidates(current, previous, outward, skeleton, score, width,
-                    cfg, used_edges):
+                    cfg, used_edges, local_edges=None):
     """Score real adjacent graph steps; never insert a bridging line."""
     options = []
     if previous is None:
@@ -143,7 +143,9 @@ def next_candidates(current, previous, outward, skeleton, score, width,
     norm = max(float(np.linalg.norm(direction)), 1e-6)
     direction /= norm
     for point in graph_neighbors(current, skeleton):
-        if point == previous or segment_key(current, point) in used_edges:
+        edge = segment_key(current, point)
+        if (point == previous or edge in used_edges or
+                (local_edges is not None and edge in local_edges)):
             continue
         x, y = point
         if float(score[y, x]) < float(cfg.get("minimum_step_evidence", .34)):
@@ -191,7 +193,7 @@ def trace_weighted(skeleton, seed_mask, fields, cfg):
         for _ in range(limit):
             candidates = next_candidates(
                 current, previous, tower_center, mask, score, width, cfg,
-                used | locally_used)
+                used, locally_used)
             if not candidates:
                 reason = "dead_end_or_low_evidence"
                 break
