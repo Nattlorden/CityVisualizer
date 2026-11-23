@@ -160,9 +160,30 @@ def trace_tower_arms(skeleton, seed_mask, cfg):
                     end_reason = "dead_end"
                     break
                 if len(choices) > 1:
-                    end_reason = "junction_review"
-                    break
-                next_pt = choices[0]
+                    # Diagonal 8-connectivity creates spurious forks along
+                    # ordinary one-pixel curves. Continue only when exactly
+                    # one branch follows the incoming direction much better.
+                    if previous is None:
+                        end_reason = "junction_review"
+                        break
+                    incoming = np.asarray(current, float) - np.asarray(previous, float)
+                    incoming /= max(float(np.linalg.norm(incoming)), 1e-6)
+                    alignments = sorted(
+                        ((float(np.dot(
+                            (np.asarray(point, float)-np.asarray(current, float)) /
+                            max(float(np.linalg.norm(
+                                np.asarray(point, float)-np.asarray(current, float))),1e-6),
+                            incoming)), point) for point in choices),
+                        reverse=True)
+                    threshold = float(cfg.get("min_forward_alignment", 0.35))
+                    margin = float(cfg.get("branch_alignment_margin", 0.22))
+                    if (alignments[0][0] < threshold or
+                            alignments[0][0] - alignments[1][0] < margin):
+                        end_reason = "junction_review"
+                        break
+                    next_pt = alignments[0][1]
+                else:
+                    next_pt = choices[0]
                 e = key(current,next_pt)
                 if e in visited_edges:
                     end_reason = "existing_trace"
@@ -180,7 +201,7 @@ def trace_tower_arms(skeleton, seed_mask, cfg):
                     zone = labels[max(0,current[1]-4):min(h,current[1]+5),
                                   max(0,current[0]-4):min(w,current[0]+5)]
                     other = set(int(v) for v in np.unique(zone) if v>0)
-                    if other and origin not in other:
+                    if any(v != origin for v in other):
                         end_reason = "other_tower"
                         break
             if len(chain) < 2:
