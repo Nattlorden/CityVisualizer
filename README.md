@@ -1,3 +1,43 @@
+# CityVisualizer v0.24 — Thickness-aware wall tracing (experimental)
+
+v0.22 remains the fortification reference; v0.23 hard/soft house masks did not demonstrably improve the traced walls. The user's uploaded `baseline_v022_black` / `baseline_v022_skeleton` diagnostics show an important loss of information: **the original black stroke thickness is not used by the v0.22 skeleton tracer**. v0.24 keeps the exact v0.22 black mask and tower anchors, but attaches **original stroke half-width**, **pixel darkness**, and a **soft proximity penalty from accepted v0.5 roof candidates** to its skeleton pixels. No house pixels are erased.
+
+At ambiguous forks, the tracer prefers a stronger, straighter, similarly thick continuation **along existing dark pixels**. When continuations are too similarly supported, or when black evidence stops, it leaves an open segment for review. It does not assume a closed wall, invent bridges between towers, or claim gate locations.
+
+From the Git CMD or PowerShell repository root:
+
+```powershell
+git pull origin main
+.\.venv\Scripts\python.exe MapExtractor\wall_trace_thickness.py --image maps\original\harn_sample_hdr.jpeg --original maps\original\harn_sample.jpeg --profile MapExtractor\profiles\harn_color_photo.water.json --building-config MapExtractor\sample-config.json
+```
+
+Review `output/fortifications_v024/`:
+
+- **`baseline_v022_wall_overlay.png`** — the unchanged v0.22 reference, recomputed with the same tower anchors and black mask
+- **`thickness_guided_wall_overlay.png`** — v0.24's proposed wall traces: **green** higher-scoring candidate, **yellow/orange** candidate needing additional review; **magenta** original tower anchors (not a claim of verified towers)
+- **`trace_difference_vs_v022.png`** — **green** traces only in v0.24, **red** traces lost from v0.22, gray common traces
+- `thickness_heatmap.png` — local width evidence derived from the v0.22 black mask, without deleting any ink
+- `wall_evidence_heatmap.png` — composite score from width, darkness and roof proximity; black background is out-of-ink
+- `house_penalty.png` / `building_roofs_v05.png` — roof proximity and the previously accepted (still unreviewed) building mask
+- `darkness_strength.png`, `thickness_halfwidth_px.png` — individual intensity diagnostics; the latter scales the estimated half-width by 20 when saving to an 8-bit PNG
+- `near_black_v022_unchanged.png`, `tower_anchors_unchanged.png` — audit inputs
+- `wall_traces_v024.geojson` — provisional LineString candidates, image-pixel coordinates, with mean ink half-width, mean evidence, tower source and termination cause
+- `stats_v024.json` — baseline/proposal segment lengths and counts, branch stop reasons
+
+The most relevant parameters are in `fortifications_v024` of `MapExtractor/profiles/harn_color_photo.water.json`:
+`target_halfwidth_px` (3), `thickness_weight` (0.55), `darkness_weight` (0.33), `house_penalty_weight` (0.20), `minimum_step_evidence` (0.34), `junction_score_margin` (0.10), `direction_weight` (0.24). **These are initial trial settings, not optimized results.** A high score means strong *image evidence*, not a confirmed medieval wall: a wide, dark road could still receive a high score.
+
+To check the synthetic regressions:
+
+```powershell
+.\.venv\Scripts\python.exe -m compileall -q MapExtractor
+.\.venv\Scripts\python.exe -m unittest discover -s MapExtractor -p "test_wall_trace_thickness.py"
+```
+
+**Acceptance criterion:** The proposal must add visibly correct exterior wall stretches while keeping the known good towers and avoiding long false routes into dark urban streets. More pixels/longer paths is not sufficient. This version has not yet been independently run against the full local HDR source or signed off by the user; **do not replace v0.22** merely because the diagnostic score increased.
+
+## Earlier development (v0.23)
+
 # CityVisualizer v0.23 – Building-aware wall tracing
 
 This experiment **is committed to GitHub** and does not modify v0.22, v0.21, earlier building extraction, or the frozen coastline. The purpose is to test whether removing **already recognized ordinary houses** reduces false branches when following near-black city walls.
