@@ -61,8 +61,13 @@ def audit_polyline(line, ink_near, settings):
         tip = coords[index]
         following = coords[index+1]
         base = np.linalg.norm(following-previous)
-        height = np.linalg.norm(tip-previous) if base < 1e-6 else abs(
-            np.cross(following-previous, tip-previous)) / base
+        # 2-D cross product as a scalar determinant. NumPy 2.x no longer
+        # accepts two-component vectors in np.cross on all installations.
+        direction = following - previous
+        offset = tip - previous
+        determinant = direction[0] * offset[1] - direction[1] * offset[0]
+        height = (float(np.linalg.norm(offset)) if base < 1e-6
+                  else abs(float(determinant)) / base)
         detour = (np.linalg.norm(tip-previous) +
                   np.linalg.norm(following-tip))
         support = min(segment_ink_fraction(previous, tip, ink_near),
