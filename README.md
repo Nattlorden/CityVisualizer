@@ -1,3 +1,42 @@
+# CityVisualizer v0.22 — Tower-anchored black masonry tracing
+
+**Fortification experiment, not a complete wall network.** Retain v0.21's good tower detections as candidate anchors. Only trace a mural line from actual dark pixels near a tower. Do **not** infer a wall between close towers and do **not** force a closed perimeter. A wall can stop at a tower, but proximity to another tower by itself never creates a graph edge.
+
+The user observed that wall marks appear nearly **black**, while streets appear **dark gray**. v0.22 measures this with grayscale thresholding and exports both grayscale and CIELAB lightness maps for inspection. That appearance is a useful hypothesis, **not yet proven** on each photographed region.
+
+Run (Windows repo root):
+
+```powershell
+git pull origin main
+.\.venv\Scripts\python.exe MapExtractor\wall_trace.py --image maps\original\harn_sample_hdr.jpeg --original maps\original\harn_sample.jpeg --profile MapExtractor\profiles\harn_color_photo.water.json --building-config MapExtractor\sample-config.json
+```
+
+In `output/fortifications_v022/` inspect:
+
+- `black_vs_gray_overlay.png`: all pixels selected as sufficiently black, **blue**, with tower anchor footprints **magenta**. This intentionally includes unrelated black drawing details; it is the intensity diagnostic only.
+- `tower_guided_wall_overlay.png`: **yellow** trace fragments from tower boundaries; **green** fragments terminating at another tower candidate; **magenta** tower anchor footprints.
+- `gray_value.png` and `lab_lightness.png`: grayscale and Lab lightness maps, useful for identifying an appropriate difference between black walls and gray roads.
+- `near_black.png`: binary strict black selection.
+- `black_skeleton.png`: one-pixel-wide traceable masonry candidates before anchoring.
+- `tower_anchors.png`: filtered v0.21 tower candidates.
+- `wall_traces_v022.geojson`: unreviewed LineString fragments with a starting tower component and why the trace stopped.
+- `stats_v022.json`: counts, excluded tower candidates and stop reasons.
+
+Most important profile values are under `fortifications_v022`: `black_gray_max` (75, higher includes more gray roads; lower removes thin black masonry), `min_tower_black_fraction` (0.55), `anchor_reach_px` (5), and `min_wall_trace_length_px` (17). `tower_water_proximity_px` is `null` by default so inland towers are **not automatically discarded**. Use the optional original source only to enable spatial water-proximity constraints when explicitly configured.
+
+The v0.21 profile still has optional `regions` and `exclude_regions`: restrict or exclude crop areas without hardcoding them in the detector. The current default has **no hand-painted mask** for this map. The decorative heading and other very dark objects can therefore still be false positive tower anchors. Port detection and integrated fortification buildings remain deferred until the traced mural network has been reviewed.
+
+Synthetic checks:
+
+```powershell
+.\.venv\Scripts\python.exe -m compileall -q MapExtractor
+.\.venv\Scripts\python.exe -m unittest discover -s MapExtractor -p "test_wall_trace.py"
+```
+
+**Limitations:** Thin broken walls can vanish under a strict black threshold, the skeleton may fork at urban junctions, and no unsupported gap is filled. Stopping at ambiguity is deliberate. The first run is a diagnostic, not proof of correct wall topology. No definitive gates are exported.
+
+## Earlier fortification work
+
 # CityVisualizer v0.21 — Fortifications (first diagnostic pass)
 
 The coastline work is paused: **v0.16 `hdr_candidate_comparison` stays the accepted coast baseline**. New work begins on distinct fortification classes:
