@@ -1,3 +1,45 @@
+# CityVisualizer v0.23 – Building-aware wall tracing
+
+This experiment **is committed to GitHub** and does not modify v0.22, v0.21, earlier building extraction, or the frozen coastline. The purpose is to test whether removing **already recognized ordinary houses** reduces false branches when following near-black city walls.
+
+Importantly, the building mask is rebuilt using the **accepted v0.5 LAB-normalized building candidates from the ORIGINAL photograph**, not a new one-off HDR color threshold. It includes a configurable dilation to cover dark roof outlines. Tower anchors from v0.21/v0.22 are computed **once** and reused identically in all three comparison modes. Suspected v0.21 attached fortification buildings are protected, although that earlier classification is not guaranteed correct.
+
+Run from the repository root (Git CMD / PowerShell):
+
+```powershell
+git pull origin main
+.\.venv\Scripts\python.exe MapExtractor\wall_trace_building_aware.py --image maps\original\harn_sample_hdr.jpeg --original maps\original\harn_sample.jpeg --profile MapExtractor\profiles\harn_color_photo.water.json --building-config MapExtractor\sample-config.json
+```
+
+The results are saved in `output/fortifications_v023/`. Start with these **three directly comparable overlays**:
+
+- `baseline_v022_wall_overlay.png` – original black-masonry tracing, no house suppression
+- `hard_mask_wall_overlay.png` – roofs and nearby outlines completely removed from the tracing mask, except protected features
+- `soft_darkness_wall_overlay.png` – only weaker gray ink around houses is removed; very black pixels remain available to the tracing algorithm
+
+Additional diagnostics:
+
+- `house_suppression_overlay.png`: **orange** areas are suppressed roof-outline neighborhoods, **magenta** protected tower zones, **green** provisionally protected attached buildings
+- `accepted_roofs.png`, `expanded_roofs.png`, `suppressed_building_outlines.png`, `protected_towers.png`, `protected_attached_buildings.png`: source masks (review carefully if a real wall is lost)
+- `baseline_v022_black.png`, `hard_mask_black.png`, `soft_darkness_black.png`: exact alternative tracing masks
+- `hard_mask_trace_difference.png`, `soft_darkness_trace_difference.png`: **red** = a v0.22 trace lost; **green** = newly traced in this variant; **gray** = unchanged
+- Each alternative also exports a `*_wall_traces.geojson` file, skeleton image and trace statistics in `stats_v023.json`
+
+All features remain unreviewed. **Do not infer a wall between nearby towers**. The goal is longer correctly drawn city-wall traces without destroying near-black masonry at the house edges. More fragments or longer total length does not by itself prove improvement.
+
+Profile options are under `fortifications_v023`: `building_outline_pad_px` (default 3), `preserve_tower_radius_px` (5), `preserve_attached_buildings` (true, switch off if too many house candidates are wrongly protected), `attached_building_pad_px` (2), `soft_black_gray_max` (43). Raising the last value preserves more near-house ink. v0.22's `black_gray_max` still controls the underlying initial black mask.
+
+Synthetic smoke tests:
+
+```powershell
+.\.venv\Scripts\python.exe -m compileall -q MapExtractor
+.\.venv\Scripts\python.exe -m unittest discover -s MapExtractor -p "test_wall_trace_building_aware.py"
+```
+
+**Current confidence:** Code and tests are published, but the real HDR-map output is not yet validated. Hard masking can erase a genuine wall where a roof mask overlaps; the soft alternative is deliberately provided as a safety comparison. The images show which option is actually worth retaining.
+
+## Previous development (v0.22)
+
 # CityVisualizer v0.22 — Tower-anchored black masonry tracing
 
 **Fortification experiment, not a complete wall network.** Retain v0.21's good tower detections as candidate anchors. Only trace a mural line from actual dark pixels near a tower. Do **not** infer a wall between close towers and do **not** force a closed perimeter. A wall can stop at a tower, but proximity to another tower by itself never creates a graph edge.
