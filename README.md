@@ -1,3 +1,41 @@
+# CityVisualizer v0.18 — Matching geometry, not post-cleanup (experimental)
+
+Retains **v0.16 `hdr_candidate_comparison` as the visual reference**. This version adjusts the candidate-selection stage itself, while leaving v0.7 water, v0.15, v0.16 and v0.17 untouched.
+
+- The dynamic-programming path chooser now tests the **actual distance between successive HDR ink intersections**. A sufficiently long step with no matching dark ink along its connecting line is invalid, allowing a gap instead of a diagonal "triangle". Real, sharp quay corners and genuinely ink-backed long segments are retained.
+- Small, closed, fairly rounded **exterior water contours** are treated as separate *review-only* inputs rather than forcing an inner coastal boundary around little blue ponds. Closed **holes inside water** (which can represent islands) and open map boundaries are **not** excluded by this heuristic.
+- The original v0.7 water mask is never modified; quarantined traces are exported separately and recoverable.
+
+Run (repo root, PowerShell or Git CMD):
+
+```powershell
+git pull origin main
+.\.venv\Scripts\python.exe MapExtractor\coast_matching.py --image maps\original\harn_sample.jpeg --hdr maps\original\harn_sample_hdr.jpeg --profile MapExtractor\profiles\harn_color_photo.water.json
+```
+
+Inspect `output/coast_matching_v018/`:
+
+- `hdr_reference_v016.png`: the winning red geometry (recomputed from v0.16).
+- `hdr_matching_v018.png`: proposed v0.18 geometry. **Red** = ordinary matching candidate; **yellow** = small-water tracing in the separate review layer; **blue** = unchanged v0.7 water edge.
+- `matched_hits_v018.png` and `small_water_review_hits_v018.png`: accepted matches and small-water matches, separately.
+- `water_v07_unchanged.png`: untouched water mask.
+- `coast_candidates_v018.geojson`: candidate inner land boundary lines.
+- `small_water_review_v018.geojson`: retained possible Pac-Man/pond traces for inspection.
+- `stats_v018.json`: skipped transitions, unmatched samples and segment counts.
+
+Settings under `coast_matching_v018` in the existing profile:
+`max_point_step_px` (35), `verify_step_from_px` (10), `min_ink_link_fraction` (0.28), `small_water_max_area_px2` (2200) and `small_water_min_circularity` (0.32). These are preliminary, deliberately tunable values; they are not verified to fix every triangle in the actual photographed map. Contours not represented in the original v0.7 mask (notably missing bays) cannot be recovered by this step.
+
+Synthetic tests:
+
+```powershell
+.\.venv\Scripts\python.exe -m unittest discover -s MapExtractor -p "test_coast_matching.py"
+```
+
+The original book-map photographs should not be redistributed as part of this public project's test assets. The public repository currently contains a user-committed HDR photograph, which is a separate copyright concern.
+
+## Previous version (v0.17)
+
 # CityVisualizer v0.17 — Conservative geometry audit (experimental)
 
 v0.16's **`hdr_candidate_comparison` is the reference**. This version does **not** change the v0.7 water surface, HDR ink extraction, coast matching, or v0.16 code. It adds a reversible review/cleanup step.
