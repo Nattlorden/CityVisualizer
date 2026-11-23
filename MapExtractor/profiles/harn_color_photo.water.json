@@ -486,5 +486,12 @@
     "branch_degree_stop": 5,
     "min_forward_alignment": 0.35,
     "branch_alignment_margin": 0.22
+  },
+  "fortifications_v023": {
+    "building_outline_pad_px": 3,
+    "preserve_tower_radius_px": 5,
+    "preserve_attached_buildings": true,
+    "attached_building_pad_px": 2,
+    "soft_black_gray_max": 43
   }
 }
