@@ -10,6 +10,18 @@ from coast_geometry import (audit_polyline, make_ink_neighborhood,
 
 
 class CoastGeometryTests(unittest.TestCase):
+    def test_2d_triangle_height_numpy_2_compatibility(self):
+        # Force the three-vertex triangle-height calculation without np.cross.
+        mask = np.zeros((80, 100), np.uint8)
+        points = [(10, 40), (22, 15), (30, 40), (70, 40)]
+        cv2.polylines(mask, [np.asarray(points, np.int32)], False, 255, 1)
+        pieces, unsupported, tips = audit_polyline(
+            LineString(points), make_ink_neighborhood(mask, 1),
+            {"min_spur_height_px": 6, "max_spur_base_px": 25,
+             "min_spur_detour_ratio": 1.5, "max_spur_ink_support": 0.1})
+        self.assertTrue(pieces)
+        self.assertFalse(unsupported)
+
     def test_unsupported_diagonal_is_split(self):
         ink = np.zeros((110, 160), np.uint8)
         cv2.line(ink, (10, 40), (60, 40), 255, 1)
