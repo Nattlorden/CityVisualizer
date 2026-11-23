@@ -56,7 +56,8 @@ class ThicknessAwareWallTests(unittest.TestCase):
         self.assertLess(b["wall_score"][40, 80],
                         a["wall_score"][40, 80])
         self.assertGreater(b["wall_score"][40, 80], .55)
-        self.assertEqual(np.count_nonzero(black), np.count_nonzero(black))
+        self.assertEqual(int(black[40, 80]), 255)
+        self.assertEqual(int(b["wall_score"][40, 80] > 0), 1)
 
     def test_redundant_diagonal_not_a_second_branch(self):
         skeleton = np.zeros((35, 35), dtype=bool)
@@ -83,9 +84,10 @@ class ThicknessAwareWallTests(unittest.TestCase):
         routes, _ = trace_weighted(skeleton, anchors, fields,
                                    self.config())
         for item in routes:
-            xs = [p[0] for p in item["line"].coords]
-            self.assertFalse(100 < min(xs) < 158)
-            self.assertFalse(100 < max(xs) < 158)
+            points = np.rint(np.asarray(item["line"].coords)).astype(int)
+            self.assertTrue(np.all(black[points[:, 1], points[:, 0]] > 0))
+            self.assertFalse(points[:, 0].min() < 100 and
+                             points[:, 0].max() > 155)
 
     def test_scores_remain_bounded_and_zero_off_ink(self):
         gray = np.full((30, 30), 120, np.uint8)
